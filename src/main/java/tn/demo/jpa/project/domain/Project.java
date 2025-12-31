@@ -85,6 +85,15 @@ public class Project {
         tasks.stream()
                 .filter(task -> task.hasId(taskId))
                 .forEach(task -> task.complete(actualSpentTime));
+
+        if (areAllTasksCompleted()) {
+            this.status = ProjectStatus.COMPLETED;
+        }
+    }
+
+    private boolean areAllTasksCompleted() {
+        return tasks.stream()
+                .allMatch(ProjectTask::isCompleted);
     }
 
     private void verifyContainsTask(ProjectTaskId projectTaskId) {
