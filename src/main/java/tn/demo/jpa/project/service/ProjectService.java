@@ -22,7 +22,7 @@ public class ProjectService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ProjectFactory projectFactory;
 
-    public ProjectService(ProjectRepository projects, tn.demo.jpa.common.IDService IDService, ApplicationEventPublisher applicationEventPublisher, ProjectFactory projectFactory) {
+    public ProjectService(ProjectRepository projects, IDService IDService, ApplicationEventPublisher applicationEventPublisher, ProjectFactory projectFactory) {
         this.projects = projects;
         this.IDService = IDService;
         this.applicationEventPublisher = applicationEventPublisher;
@@ -43,11 +43,6 @@ public class ProjectService {
                 .orElseThrow(() -> new UnknownProjectIdException(projectId));
 
         project.addTask(taskId, taskName, description, toDomain(estimation));
-        publishNewTaskAddedToProjectEvent(projectId, taskId);
-        return taskId;
-    }
-
-    private ProjectTaskId publishNewTaskAddedToProjectEvent(ProjectId projectId, ProjectTaskId taskId) {
         applicationEventPublisher.publishEvent(new TaskAddedToProjectEvent(projectId, taskId));
         return taskId;
     }
