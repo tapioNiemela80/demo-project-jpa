@@ -6,7 +6,6 @@ import tn.demo.jpa.common.domain.AggregateRoot;
 import tn.demo.jpa.project.domain.ProjectTaskId;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @AggregateRoot
 @Entity
@@ -30,7 +29,7 @@ public class Team {
     private Team(UUID id, String name) {
         this.id = id;
         this.name = name;
-        this.version =0;
+        this.version = 0;
         this.members = new HashSet<>();
         this.tasks = new HashSet<>();
     }
@@ -64,12 +63,13 @@ public class Team {
     public void removeTask(TeamTaskId taskId) {
         verifyContainsTask(taskId);
         verifyTaskCanBeRemoved(taskId);
-        tasks.stream()
+        TeamTask foundTask = tasks.stream()
                 .filter(task -> task.hasId(taskId))
-                .forEach(this::removeTask);
+                .findAny().orElseThrow();
+        removeTask(foundTask);
     }
 
-    private void removeTask(TeamTask task){
+    private void removeTask(TeamTask task) {
         this.tasks.remove(task);
         task.markTeamRemoved();
     }
@@ -78,12 +78,13 @@ public class Team {
         Objects.requireNonNull(memberId);
         verifyContainsMember(memberId);
         verifyMemberCanBeRemoved(memberId);
-        members.stream()
+        TeamMember foundMember = members.stream()
                 .filter(member -> member.hasId(memberId))
-                .forEach(this::removeMember);
+                .findFirst().orElseThrow();
+        removeMember(foundMember);
     }
 
-    private void removeMember(TeamMember member){
+    private void removeMember(TeamMember member) {
         this.members.remove(member);
         member.markTeamRemoved();
     }
@@ -138,7 +139,7 @@ public class Team {
         verifyContainsTask(taskId);
         tasks.stream()
                 .filter(task -> task.hasId(taskId))
-                .forEach(task -> task.markInProgress());
+                .forEach(TeamTask::markInProgress);
     }
 
     public void markTaskCompleted(TeamTaskId taskId, ActualSpentTime actualSpentTime) {
@@ -152,7 +153,7 @@ public class Team {
         verifyContainsTask(taskId);
         tasks.stream()
                 .filter(task -> task.hasId(taskId))
-                .forEach(task -> task.unassign());
+                .forEach(TeamTask::unassign);
     }
 
     @Override
