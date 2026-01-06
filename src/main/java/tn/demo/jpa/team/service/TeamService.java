@@ -100,9 +100,9 @@ public class TeamService {
 
     @Transactional
     public void completeTask(TeamId teamId, TeamTaskId taskID, ActualSpentTime actualSpentTime) {
-        var timeSpent = toDomain(actualSpentTime);
         Team team = teams.findById(teamId.value())
                 .orElseThrow(() -> new UnknownTeamIdException(teamId));
+        var timeSpent = toDomain(actualSpentTime);
         team.markTaskCompleted(taskID, timeSpent);
         publishTaskCompletedEvent(taskID, team, timeSpent);
     }
@@ -111,10 +111,9 @@ public class TeamService {
         return new tn.demo.jpa.common.domain.ActualSpentTime(actualSpentTime.hours(), actualSpentTime.minutes());
     }
 
-    private Team publishTaskCompletedEvent(TeamTaskId taskID, Team team, tn.demo.jpa.common.domain.ActualSpentTime actualSpentTime) {
+    private void publishTaskCompletedEvent(TeamTaskId taskID, Team team, tn.demo.jpa.common.domain.ActualSpentTime actualSpentTime) {
         team.getOriginalTaskId(taskID)
                 .ifPresent(projectTaskId -> applicationEventPublisher.publishEvent(new TeamTaskCompletedEvent(taskID, projectTaskId, actualSpentTime)));
-        return team;
     }
 
 }

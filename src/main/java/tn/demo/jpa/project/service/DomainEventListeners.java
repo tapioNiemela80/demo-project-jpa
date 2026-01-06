@@ -8,10 +8,10 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 import tn.demo.jpa.common.EmailClientService;
 import tn.demo.jpa.common.EmailMessage;
-import tn.demo.jpa.common.domain.ActualSpentTime;
 import tn.demo.jpa.common.domain.EmailAddress;
 import tn.demo.jpa.project.domain.EmailNotificationPolicy;
 import tn.demo.jpa.project.domain.Project;
@@ -22,6 +22,8 @@ import tn.demo.jpa.project.repository.ProjectRepository;
 import tn.demo.jpa.team.events.TeamTaskCompletedEvent;
 
 import java.util.Optional;
+
+import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
 @Component
 public class DomainEventListeners {
@@ -49,9 +51,9 @@ public class DomainEventListeners {
             backoff = @Backoff(delay = 200)
     )
     @TransactionalEventListener
+    @Transactional(propagation = REQUIRES_NEW)
     public void on(TeamTaskCompletedEvent teamTaskCompletedEvent) {
         log.atDebug().log(() -> "teamTaskCompletedEvent %s".formatted(teamTaskCompletedEvent));
-
         Optional<Project> projectByTaskId = projects.findByTaskId(teamTaskCompletedEvent.getProjectTaskId().value());
         projectByTaskId.ifPresentOrElse(project -> markProjectTaskCompleted(teamTaskCompletedEvent, project),
                 () -> log.warn("Project by task id not found {}", teamTaskCompletedEvent.getProjectTaskId()));
@@ -102,7 +104,7 @@ public class DomainEventListeners {
     }
 
     private void markProjectTaskCompleted(TeamTaskCompletedEvent teamTaskCompletedEvent, Project project) {
-        project.completeTask((teamTaskCompletedEvent.getProjectTaskId()), teamTaskCompletedEvent.getActualSpentTime());
+        project.completeTask(teamTaskCompletedEvent.getProjectTaskId(), teamTaskCompletedEvent.getActualSpentTime());
     }
 
 }
