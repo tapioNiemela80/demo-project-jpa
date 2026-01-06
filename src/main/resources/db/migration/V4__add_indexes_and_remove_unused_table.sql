@@ -9,3 +9,5 @@ CREATE INDEX idx_team_tasks_team_id
 
 CREATE INDEX idx_team_members_team_id
     ON project_demo_jpa.team_members (team_id);
+
+DROP TABLE project_demo_jpa.contact_persons;
