@@ -32,7 +32,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(UnknownProjectTaskIdException.class)
     public ResponseEntity<String> handleUnknownProjectTaskIdException(UnknownProjectTaskIdException ex) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
 
@@ -68,21 +68,21 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(UnknownTeamIdException.class)
     public ResponseEntity<String> handleUnknownTeamIdException(UnknownTeamIdException ex) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
 
     @ExceptionHandler(UnknownTeamMemberIdException.class)
     public ResponseEntity<String> handleUnknownTeamMemberIdException(UnknownTeamMemberIdException ex) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
 
     @ExceptionHandler(UnknownTeamTaskIdException.class)
     public ResponseEntity<String> handleUnknownTeamTaskIdException(UnknownTeamTaskIdException ex) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
 

@@ -122,9 +122,9 @@ public class Project {
     }
 
     public Optional<EmailAddress> validContactEmail() {
-        return EmailAddress.rehydrate(contactPersonEmail).isValid() ?
-                Optional.of(EmailAddress.rehydrate(contactPersonEmail))
-                : Optional.empty();
+        return Optional.ofNullable(contactPersonEmail)
+                .map(EmailAddress::rehydrate)
+                .filter(EmailAddress::isValid);
     }
 
     @Override
